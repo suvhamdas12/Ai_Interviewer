@@ -5,12 +5,11 @@ A web-based platform that conducts AI-driven interviews for Java developers. Pow
 ---
 
 ## 📸 Screenshots
+<img width="1432" alt="image" src="https://github.com/user-attachments/assets/2f2045fd-7355-47c6-8a29-2d6c9cc4a112" />
 
-### 🧑‍💼 Interview UI
-![Interview Screen](./screenshots/interview-screen.png)
 
 ### 💻 Coding Question UI
-![Coding Screen](./screenshots/coding-question.png)
+<img width="1422" alt="image" src="https://github.com/user-attachments/assets/f71f1282-26b0-485c-97f4-99f3e15779c8" />
 
 ---
 
