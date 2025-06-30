@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Interviewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f2f2f2;
+    }
+    h1 { color: #333; }
+    .card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    pre {
+      background: #eee;
+      padding: 1rem;
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Java Spring Boot Interview System</h1>
+
+  <div class="card">
+    <h2>Start Interview</h2>
+    <label>Candidate Name:</label>
+    <input type="text" id="name" value="Suvham" />
+
+    <label>Experience Level:</label>
+    <select id="level">
+      <option value="junior">Junior</option>
+      <option value="mid">Mid</option>
+      <option value="senior">Senior</option>
+    </select>
+
+    <label>Focus Area:</label>
+    <select id="areas">
+      <option value="core_java">Core Java</option>
+      <option value="spring_boot">Spring Boot</option>
+      <option value="microservices">Microservices</option>
+      <option value="database">Database</option>
+      <option value="testing">Testing</option>
+    </select>
+
+    <button onclick="startInterview()">Start Interview</button>
+    <div id="question-box"></div>
+  </div>
+
+  <div class="card">
+    <h2>Submit Answer</h2>
+    <label>Answer:</label>
+    <textarea id="answer" rows="4"></textarea>
+    <button onclick="submitAnswer()">Submit Answer</button>
+    <button onclick="nextQuestion()">Next Question</button>
+    <div id="feedback-box"></div>
+  </div>
+
+  <div class="card">
+    <h2>Coding Challenge</h2>
+    <button onclick="getCodingQuestion()">Get Coding Question</button>
+    <div id="coding-box"></div>
+  </div>
+
+  <div class="card">
+    <h2>Sample Questions</h2>
+    <label>Topic:</label>
+    <input type="text" id="sample-topic" value="spring_boot" />
+    <label>Level:</label>
+    <select id="sample-level">
+      <option value="junior">Junior</option>
+      <option value="mid">Mid</option>
+      <option value="senior">Senior</option>
+    </select>
+    <button onclick="getSampleQuestions()">Fetch</button>
+    <div id="sample-box"></div>
+  </div>
+
+  <div class="card">
+    <h2>Health Check</h2>
+    <button onclick="checkHealth()">Check API</button>
+    <div id="health-box"></div>
+  </div>
+
+  <script>
+    let lastQuestion = '';
+
+    async function startInterview() {
+      const name = document.getElementById("name").value;
+      const level = document.getElementById("level").value;
+      const selectedArea = document.getElementById("areas").value;
+
+      const response = await fetch("http://localhost:8000/start-interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          candidate_name: name,
+          experience_level: level,
+          focus_areas: [selectedArea]
+        })
+      });
+
+      const data = await response.json();
+      lastQuestion = data.question;
+
+      document.getElementById("question-box").innerHTML = `
+        <h3>Question:</h3>
+        <pre>${data.question}</pre>
+      `;
+    }
+
+    async function submitAnswer() {
+      const answer = document.getElementById("answer").value;
+
+      const response = await fetch("http://localhost:8000/evaluate-response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: lastQuestion,
+          candidate_answer: answer
+        })
+      });
+
+      const data = await response.json();
+
+      document.getElementById("feedback-box").innerHTML = `
+        <h3>Feedback:</h3>
+        <pre><strong>Score:</strong> ${data.score}\n${data.feedback}</pre>
+        <h4>Suggestions:</h4>
+        <ul>${data.suggestions.map(s => `<li>${s}</li>`).join("")}</ul>
+      `;
+    }
+
+    async function nextQuestion() {
+      const answer = document.getElementById("answer").value;
+
+      const response = await fetch("http://localhost:8000/next-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: lastQuestion,
+          candidate_answer: answer
+        })
+      });
+
+      const data = await response.json();
+      lastQuestion = data.question;
+
+      document.getElementById("question-box").innerHTML = `
+        <h3>Next Question:</h3>
+        <pre>${data.question}</pre>
+      `;
+    }
+
+    async function getCodingQuestion() {
+      const response = await fetch("http://localhost:8000/coding-question", {
+        method: "POST"
+      });
+
+      const data = await response.json();
+      lastQuestion = data.question;
+
+      document.getElementById("coding-box").innerHTML = `
+        <h3>Coding Challenge:</h3>
+        <pre>${data.question}</pre>
+      `;
+    }
+
+    async function getSampleQuestions() {
+      const topic = document.getElementById("sample-topic").value;
+      const level = document.getElementById("sample-level").value;
+
+      const response = await fetch(`http://localhost:8000/sample-questions/${topic}/${level}`);
+      const data = await response.json();
+
+      document.getElementById("sample-box").innerHTML = `
+        <h3>Sample Questions for ${topic} - ${level}</h3>
+        <ul>${data.questions.map(q => `<li>${q}</li>`).join("")}</ul>
+      `;
+    }
+
+    async function checkHealth() {
+      const response = await fetch("http://localhost:8000/health");
+      const data = await response.json();
+
+      document.getElementById("health-box").innerHTML = `
+        <pre>Status: ${data.status}\nTime: ${data.timestamp}</pre>
+      `;
+    }
+  </script>
+</body>
+</html>

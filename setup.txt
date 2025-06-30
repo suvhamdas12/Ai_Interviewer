@@ -1,0 +1,109 @@
+# Setup Instructions
+
+## 1. Environment Setup
+
+### Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+
+```bash
+python main.py
+```
+
+The API will be available at: http://localhost:8000
+
+## 3. API Documentation
+
+Once running, visit: http://localhost:8000/docs for interactive API documentation
+
+## 4. API Endpoints
+
+### Start Interview
+POST /start-interview
+```json
+{
+  "candidate_name": "John Doe",
+  "experience_level": "mid",
+  "focus_areas": ["core_java", "spring_boot"]
+}
+```
+
+### Get Next Question
+POST /next-question
+```json
+{
+  "question": "What is dependency injection?",
+  "candidate_answer": "Dependency injection is a design pattern..."
+}
+```
+
+### Get Behavioral Question
+POST /coding-question
+(No body required)
+
+### Evaluate Response
+POST /evaluate-response
+```json
+{
+  "question": "Explain Spring Boot auto-configuration",
+  "candidate_answer": "Spring Boot auto-configuration automatically configures..."
+}
+```
+
+### Sample Questions
+GET /sample-questions/{topic}/{level}
+Example: GET /sample-questions/spring_boot/junior
+
+## 5. Usage Example
+
+```python
+import requests
+
+# Start interview
+response = requests.post("http://localhost:8000/start-interview", json={
+    "candidate_name": "Jane Smith",
+    "experience_level": "senior",
+    "focus_areas": ["spring_boot", "microservices"]
+})
+
+print(response.json())
+
+# Get coding question
+response = requests.post("http://localhost:8000/coding-question")
+print(response.json())
+```
+
+## 6. Customization
+
+### Adding More Questions
+Modify the `JavaSpringBootKnowledgeBase` class to add more questions for different topics and levels.
+
+### Changing LLM Model
+Update the `get_groq_llm()` function to use different Groq models:
+- llama-3.1-70b-versatile (default)
+- mixtral-8x7b-32768
+- llama-3.1-8b-instant
+
+### Adding New Topics
+Extend the knowledge_base dictionary in `JavaSpringBootKnowledgeBase` with new topics like:
+- "database" (already included)
+- "testing" (already included)
+- "security"
+- "deployment"
+- "performance"
+
+## 7. Features
+
+- **Pure Technical Focus**: Only technical Java and Spring Boot questions
+- **Adaptive Questioning**: Questions adjust based on candidate responses
+- **Multiple Experience Levels**: Junior, Mid, Senior level questions
+- **Coding Challenges**: Practical programming questions
+- **Real-time Evaluation**: Immediate feedback on responses
+- **Comprehensive Topic Coverage**: Core Java, Spring Boot, Microservices, Database, Testing
+- **RESTful API**: Easy integration with frontend applications
+
+## 8. Frontend Integration
+
+You can build a web frontend using React, Vue, or any other framework to interact with these APIs and create a complete interview experience.
